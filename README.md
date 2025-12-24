@@ -13,24 +13,24 @@ Criar uma API simples, gratuita e local executando em um Mac mini, acessível a 
 1) **Preparar o Mac mini**
    - Instalar Homebrew (se não houver):  
      `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-   - Instalar runtime: `brew install python` (ou `brew install node`)
+   - Instalar runtime: `brew install python3` (ou `brew install node`)
    - Instalar Tailscale: `brew install tailscale` e iniciar: `sudo tailscale up`
    - Habilitar SSH: Preferências do Sistema > Compartilhamento > Ativar “Acesso Remoto” (ou `sudo systemsetup -setremotelogin on`).
 
 2) **Subir API mínima (exemplo FastAPI)**
-   ```bash
-   python -m venv .venv && source .venv/bin/activate
-   pip install fastapi uvicorn
-   cat > app.py <<'EOF'
-   from fastapi import FastAPI
-   app = FastAPI()
-   @app.get("/health")
-   def health():
-       return {"status": "ok"}
-   EOF
-   uvicorn app:app --host 0.0.0.0 --port 8000
-   ```
-   (Para Express, substituir pelo boilerplate equivalente com `npm init -y && npm install express`.)
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install fastapi uvicorn
+cat > app.py <<'EOF'
+from fastapi import FastAPI
+app = FastAPI()
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+EOF
+uvicorn app:app --host 0.0.0.0 --port 8000
+```
+(Para Express, substituir pelo boilerplate equivalente com `npm init -y && npm install express`.)
 
 3) **Acessar do MacBook**
    - Conectar Tailscale com a mesma conta e anotar o IP Tailscale do Mac mini.
@@ -39,7 +39,7 @@ Criar uma API simples, gratuita e local executando em um Mac mini, acessível a 
 
 4) **Observabilidade e manutenção**
    - Verificar logs diretamente no terminal do Mac mini.
-   - Opcional: usar `launchd` para manter o processo vivo ou um `tmux`/`screen`.
+   - Para algo simples, use `tmux new -s api` e mantenha o servidor rodando na sessão; para algo automático na inicialização, configure um serviço `launchd`.
 
 ## Próximos incrementos (MVP > 0)
 - Persistência leve (SQLite) para dados mínimos.
