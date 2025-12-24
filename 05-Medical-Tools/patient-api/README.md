@@ -33,7 +33,8 @@ python main.py
 
 ### Pacientes / Patients
 
-- `GET /api/patients` - Lista todos os pacientes
+- `GET /api/patients` - Lista todos os pacientes (educacional)
+- `POST /api/patients/search` - Busca pacientes com filtros (RECOMENDADO)
 - `GET /api/patients/{id}` - Busca paciente por ID
 - `GET /api/patients/cpf/{cpf}` - Busca por CPF
 - `POST /api/patients` - Cadastra novo paciente
@@ -118,13 +119,22 @@ curl -X POST http://localhost:3000/api/patients \
 ### Buscar Pacientes
 
 ```bash
-# Todos os pacientes
+# Todos os pacientes (GET - para demonstração)
 curl http://localhost:3000/api/patients
 
-# Por CPF
-curl http://localhost:3000/api/patients/cpf/123.456.789-00
+# Busca com POST (RECOMENDADO para produção)
+curl -X POST http://localhost:3000/api/patients/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "active",
+    "ageMin": 18,
+    "ageMax": 65
+  }'
 
-# Com filtros
+# Por CPF
+curl http://localhost:3000/api/patients/cpf/111.444.777-35
+
+# Com filtros (GET - educacional, use POST em produção)
 curl "http://localhost:3000/api/patients?status=active&ageMin=18&ageMax=65"
 ```
 

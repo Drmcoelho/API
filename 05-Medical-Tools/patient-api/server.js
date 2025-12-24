@@ -28,13 +28,15 @@ app.use((req, res, next) => {
 });
 
 // DADOS EM MEMÓRIA / IN-MEMORY DATA
+// Em produção, você usaria um banco de dados real (MongoDB, PostgreSQL, etc.)
+// In production, you would use a real database (MongoDB, PostgreSQL, etc.)
 let patients = [
   {
     id: uuidv4(),
     personalInfo: {
       firstName: "João",
       lastName: "Silva",
-      cpf: "123.456.789-00",
+      cpf: "111.444.777-35",  // CPF de teste válido / Valid test CPF
       birthDate: "1990-05-15",
       gender: "M",
       email: "joao.silva@email.com",
@@ -184,6 +186,80 @@ app.get('/api/patients', (req, res) => {
   const { status, ageMin, ageMax, gender, bloodType, search } = req.query;
   
   // Validar ageMin e ageMax para prevenir injeção
+  if (ageMin && (isNaN(ageMin) || parseInt(ageMin) < 0)) {
+    return res.status(400).json({
+      success: false,
+      error: 'ageMin deve ser um número positivo / ageMin must be a positive number'
+    });
+  }
+  
+  if (ageMax && (isNaN(ageMax) || parseInt(ageMax) < 0)) {
+    return res.status(400).json({
+      success: false,
+      error: 'ageMax deve ser um número positivo / ageMax must be a positive number'
+    });
+  }
+  
+  let filtered = patients.filter(p => p.status !== 'deleted');
+  
+  if (status) {
+    filtered = filtered.filter(p => p.status === status);
+  }
+  
+  if (gender) {
+    filtered = filtered.filter(p => p.personalInfo.gender === gender);
+  }
+  
+  if (bloodType) {
+    filtered = filtered.filter(p => p.medicalInfo.bloodType === bloodType);
+  }
+  
+  if (ageMin || ageMax) {
+    filtered = filtered.filter(p => {
+      const age = calculateAge(p.personalInfo.birthDate);
+      if (ageMin && age < parseInt(ageMin)) return false;
+      if (ageMax && age > parseInt(ageMax)) return false;
+      return true;
+    });
+  }
+  
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filtered = filtered.filter(p => 
+      p.personalInfo.firstName.toLowerCase().includes(searchLower) ||
+      p.personalInfo.lastName.toLowerCase().includes(searchLower)
+    );
+  }
+  
+  res.json({
+    success: true,
+    count: filtered.length,
+    data: filtered.map(p => ({
+      ...p,
+      age: calculateAge(p.personalInfo.birthDate)
+    }))
+  });
+});
+
+/**
+ * BUSCAR PACIENTES (POST - Mais seguro) / SEARCH PATIENTS (POST - More secure)
+ * 
+ * ✅ MÉTODO RECOMENDADO PARA PRODUÇÃO / RECOMMENDED METHOD FOR PRODUCTION
+ * 
+ * Use POST para buscas com filtros sensíveis:
+ * - Dados não ficam em logs de servidor
+ * - Não aparecem no histórico do browser
+ * - Permite filtros complexos
+ * 
+ * Use POST for searches with sensitive filters:
+ * - Data doesn't stay in server logs
+ * - Doesn't appear in browser history
+ * - Allows complex filters
+ */
+app.post('/api/patients/search', (req, res) => {
+  const { status, ageMin, ageMax, gender, bloodType, search } = req.body;
+  
+  // Mesma validação do GET
   if (ageMin && (isNaN(ageMin) || parseInt(ageMin) < 0)) {
     return res.status(400).json({
       success: false,

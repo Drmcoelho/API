@@ -16,6 +16,11 @@
 const { ApolloServer } = require('@apollo/server');
 const { startStandaloneServer } = require('@apollo/server/standalone');
 
+// CONSTANTES / CONSTANTS
+// Padrão de validação de email (RFC 5322 simplificado)
+// Email validation pattern (RFC 5322 simplified)
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // SCHEMA - Define a estrutura da API
 // Schema defines the API structure
 const typeDefs = `#graphql
@@ -181,9 +186,7 @@ const resolvers = {
   Mutation: {
     createUser: (parent, args) => {
       // Validação de email com padrão mais robusto
-      // RFC 5322 simplified pattern
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(args.email)) {
+      if (!EMAIL_PATTERN.test(args.email)) {
         throw new Error('Email inválido / Invalid email');
       }
       
@@ -255,8 +258,7 @@ const resolvers = {
       }
       
       // Validação de email se fornecido com padrão mais robusto
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (args.email && !emailPattern.test(args.email)) {
+      if (args.email && !EMAIL_PATTERN.test(args.email)) {
         throw new Error('Email inválido / Invalid email');
       }
       
