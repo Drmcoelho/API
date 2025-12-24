@@ -274,7 +274,7 @@ Muitas aplicações modernas usam múltiplos protocolos:
 ## 🚀 Evolução e Futuro / Evolution and Future
 
 ### Tendências Atuais
-1. **REST ainda domina** - 70%+ das APIs públicas
+1. **REST ainda domina** - Estimativa: ~70% das APIs públicas (baseado em pesquisas de mercado)
 2. **GraphQL crescendo** - Especialmente em mobile
 3. **gRPC para backend** - Microserviços adotando
 4. **WebSocket maduro** - Socket.IO, SignalR consolidados

@@ -180,8 +180,10 @@ const resolvers = {
   // Mutations - Operações de escrita
   Mutation: {
     createUser: (parent, args) => {
-      // Validação de email
-      if (!args.email.includes('@')) {
+      // Validação de email com padrão mais robusto
+      // RFC 5322 simplified pattern
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(args.email)) {
         throw new Error('Email inválido / Invalid email');
       }
       
@@ -252,8 +254,9 @@ const resolvers = {
         throw new Error('Usuário não encontrado / User not found');
       }
       
-      // Validação de email se fornecido
-      if (args.email && !args.email.includes('@')) {
+      // Validação de email se fornecido com padrão mais robusto
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (args.email && !emailPattern.test(args.email)) {
         throw new Error('Email inválido / Invalid email');
       }
       

@@ -75,10 +75,34 @@ function validateCPF(cpf) {
   // Verifica se tem 11 dígitos
   if (cleanCPF.length !== 11) return false;
   
-  // Verifica se não é sequência
+  // Verifica se não é sequência (111.111.111-11, etc.)
   if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
   
-  // Validação simplificada (em produção, use validação completa)
+  // NOTA EDUCACIONAL: Esta é uma validação simplificada
+  // Em produção, implemente a validação completa com verificação dos dígitos
+  // Algoritmo completo: https://www.geradorcpf.com/algoritmo_do_cpf.htm
+  
+  // Validação completa dos dígitos verificadores
+  let sum = 0;
+  let remainder;
+  
+  // Valida primeiro dígito
+  for (let i = 1; i <= 9; i++) {
+    sum += parseInt(cleanCPF.substring(i - 1, i)) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCPF.substring(9, 10))) return false;
+  
+  // Valida segundo dígito
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum += parseInt(cleanCPF.substring(i - 1, i)) * (12 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCPF.substring(10, 11))) return false;
+  
   return true;
 }
 
