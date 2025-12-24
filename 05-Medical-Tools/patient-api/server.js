@@ -157,9 +157,46 @@ app.get('/', (req, res) => {
 
 /**
  * LISTAR PACIENTES / LIST PATIENTS
+ * 
+ * ⚠️ NOTA DE SEGURANÇA / SECURITY NOTE:
+ * Este endpoint usa GET com query parameters para fins educacionais.
+ * Em produção com dados reais:
+ * 1. Use POST com body para filtros complexos
+ * 2. Implemente autenticação JWT/OAuth
+ * 3. Implemente autorização baseada em roles
+ * 4. Use HTTPS obrigatório
+ * 5. Registre todos os acessos (audit log)
+ * 6. Implemente rate limiting por usuário
+ * 
+ * This endpoint uses GET with query parameters for educational purposes.
+ * In production with real data:
+ * 1. Use POST with body for complex filters
+ * 2. Implement JWT/OAuth authentication
+ * 3. Implement role-based authorization
+ * 4. Use HTTPS mandatory
+ * 5. Log all accesses (audit log)
+ * 6. Implement rate limiting per user
  */
 app.get('/api/patients', (req, res) => {
+  // AVISO: Query parameters não são ideais para dados sensíveis
+  // WARNING: Query parameters are not ideal for sensitive data
+  // Validação e sanitização dos parâmetros de query
   const { status, ageMin, ageMax, gender, bloodType, search } = req.query;
+  
+  // Validar ageMin e ageMax para prevenir injeção
+  if (ageMin && (isNaN(ageMin) || parseInt(ageMin) < 0)) {
+    return res.status(400).json({
+      success: false,
+      error: 'ageMin deve ser um número positivo / ageMin must be a positive number'
+    });
+  }
+  
+  if (ageMax && (isNaN(ageMax) || parseInt(ageMax) < 0)) {
+    return res.status(400).json({
+      success: false,
+      error: 'ageMax deve ser um número positivo / ageMax must be a positive number'
+    });
+  }
   
   let filtered = patients.filter(p => p.status !== 'deleted');
   
